@@ -10,6 +10,10 @@ public class Communication {
     InputStream input;
     byte[] bytes;
     public Communication(LearnerConfig config) throws Exception {
+//        // Test CS communication
+//        System.out.println("symbol: " + "ADU1CWR");
+//        System.out.println("encryptSymbol: " + encryptSymbol("ADU1CWR"));
+//        System.out.println("decryptSymbol: " + decryptSymbol("2AD3SUC"));
         try {
             socket = new Socket(config.host, config.port);
         } catch (Exception e) {
@@ -20,7 +24,7 @@ public class Communication {
         output = socket.getOutputStream();
         input = socket.getInputStream();
         // Test CS communication
-        decryptSymbol(receiveSymbol(encryptSymbol("ADU1C")));
+        decryptSymbol(receiveSymbol(encryptSymbol("ADU1CWR")));
         while (true){}
     }
 
@@ -36,38 +40,50 @@ public class Communication {
 
     public String encryptSymbol(String symbol) {
         switch (symbol) {
-            case "ADU1C":
-                return "2AD2U11C0";
-            case "DDU1C":
-                return "2DD2U11C0";
-            case "DDU2C":
-                return "2DD2U21C0";
-            case "SQU1CU2":
-                return "2SQ2U11C2U2";
-            case "SAU1CU2":
-                return "2SA2U11C2U2";
-            case "USU1CU2":
-                return "2US2U11C2U2";
-            case "QHU2C":
-                return "2QH2U21C0";
-            case "CLONU1D":
-                return "4CLON2U11D0";
-            case "CLOFU1D":
-                return "4CLOF2U11D0";
-            case "CLONU2D":
-                return "4CLON2U21D0";
-            case "CLOFU2D":
-                return "4CLOF2U21D0";
-            case "CRU1D":
-                return "2CR2U11D0";
-            case "CRU2D":
-                return "2CR2U21D0";
-            case "ACU2C":
-                return "2AC2U21C0";
-            case "DEU2C":
-                return "2DE2U21C0";
+            case "ADU1CWR":
+                return "2AD2U11C2WR0";
+            case "DDU1CWR":
+                return "2DD2U11C2WR0";
+            case "SQU1CWRU2":
+                return "2SQ2U11C2WR2U2";
+            case "SAU1CWRU2":
+                return "2SA2U11C2WR2U2";
+            case "USU1CWRU2":
+                return "2US2U11C2WR2U2";
+            case "QHU2CWR":
+                return "2QH2U21C2WR0";
+            case "DCU1DWRON":
+                return "2DC2U11D2WR2ON";
+            case "DCU1DWROF":
+                return "2DC2U11D2WR2OF";
+            case "DCU1DWLON":
+                return "2DC2U11D2WL2ON";
+            case "DCU1DWLOF":
+                return "2DC2U11D2WL2OF";
+            case "DCU1DZBON":
+                return "2DC2U11D2ZB2ON";
+            case "DCU1DZBOF":
+                return "2DC2U11D2ZB2OF";
+            case "DCU2DWRON":
+                return "2DC2U21D2WR2ON";
+            case "DCU2DWROF":
+                return "2DC2U21D2WR2OF";
+            case "DCU2DWLON":
+                return "2DC2U21D2WL2ON";
+            case "DCU2DWLOF":
+                return "2DC2U21D2WL2OF";
+            case "DCU2DZBON":
+                return "2DC2U21D2ZB2ON";
+            case "DCU2DZBOF":
+                return "2DC2U21D2ZB2OF";
+            case "ACU2CWR":
+                return "2AC2U21C2WR0";
+            case "DEU2CWR":
+                return "2DE2U21C2WR0";
             case "RESET":
-                return "5RESET000";
+                return "5RESET0000";
+            case "FINISH":
+                return "6FINISH0000";
             default:
                 return "Wrong_symbol";
         }
@@ -85,6 +101,15 @@ public class Communication {
             num = (int)symbol.charAt(count) - 48;
         }
         String decryptSymbol = symbol.substring(count, count + total);
+        count += total; total = 0;
+        num = (int)symbol.charAt(count) - 48;
+        while (num >= 0 && num <= 9) {
+            total *= 10;
+            total += num;
+            count++;
+            num = (int)symbol.charAt(count) - 48;
+        }
+        decryptSymbol += symbol.substring(count, count + total);
         System.out.println("Frida server(decrypted): " + decryptSymbol);
         return decryptSymbol;
     }
