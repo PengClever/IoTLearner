@@ -20,7 +20,7 @@ public class Communication {
         output = socket.getOutputStream();
         input = socket.getInputStream();
         // Test CS communication
-        decryptSymbol(receiveSymbol("2AD2U11C0"));
+        decryptSymbol(receiveSymbol(encryptSymbol("ADU1C")));
         while (true){}
     }
 
@@ -66,6 +66,8 @@ public class Communication {
                 return "2AC2U21C0";
             case "DEU2C":
                 return "2DE2U21C0";
+            case "RESET":
+                return "5RESET000";
             default:
                 return "Wrong_symbol";
         }
@@ -102,6 +104,6 @@ public class Communication {
     }
 
     public void reset() throws Exception {
-        output.write("5RESET000".getBytes());
+        output.write(encryptSymbol("RESET").getBytes());
     }
 }
