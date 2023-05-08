@@ -13,7 +13,7 @@ public class Communication {
 //        // Test CS communication
 //        System.out.println("symbol: " + "ADU1CWR");
 //        System.out.println("encryptSymbol: " + encryptSymbol("ADU1CWR"));
-//        System.out.println("decryptSymbol: " + decryptSymbol("2AD3SUC"));
+//        System.out.println("decryptSymbol: " + decryptSymbol("5ERROR0"));
         try {
             socket = new Socket(config.host, config.port);
         } catch (Exception e) {
@@ -103,13 +103,15 @@ public class Communication {
         String decryptSymbol = symbol.substring(count, count + total);
         count += total; total = 0;
         num = (int)symbol.charAt(count) - 48;
-        while (num >= 0 && num <= 9) {
-            total *= 10;
-            total += num;
-            count++;
-            num = (int)symbol.charAt(count) - 48;
+        if (num != 0) {
+            while (num >= 0 && num <= 9) {
+                total *= 10;
+                total += num;
+                count++;
+                num = (int) symbol.charAt(count) - 48;
+            }
+            decryptSymbol += symbol.substring(count, count + total);
         }
-        decryptSymbol += symbol.substring(count, count + total);
         System.out.println("Frida server(decrypted): " + decryptSymbol);
         return decryptSymbol;
     }
