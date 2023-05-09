@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.Vector;
 
 public class Communication {
@@ -12,6 +13,9 @@ public class Communication {
     InputStream input;
     byte[] bytes;
     Vector<String> queries;
+    Vector<String> queriesReply;
+    Vector<String> lastQueries;
+    Vector<String> lastQueriesReply;
     public Communication(LearnerConfig config) throws Exception {
         // Test CS communication
 //        System.out.println("symbol: " + "ADU1CWRD88:97:46:2C:9A:CE");
@@ -33,8 +37,11 @@ public class Communication {
         socket.setSoTimeout(0);
         output = socket.getOutputStream();
         input = socket.getInputStream();
+        lastQueries = new Vector<>(100);
+        lastQueriesReply = new Vector<>(100);
         // Test CS communication
 //        decryptSymbol(receiveSymbol(encryptSymbol("ADU1CWR")));
+//        receiveSymbol("111");
 //        while (true){}
     }
 
@@ -166,6 +173,12 @@ public class Communication {
 
     public String encryptSymbol(String symbol) {
         switch (symbol) {
+            case "a":
+                return "a";
+            case "b":
+                return "b";
+            case "c":
+                return "c";
             case "ADU1CWR":
                 return "2AD2U11C2WR0";
             case "ADU1CWRD88:97:46:2C:9A:CE":
@@ -244,6 +257,9 @@ public class Communication {
     public String decryptSymbol(String symbol, boolean isReset) throws IOException {
         if (symbol == null)
             return null;
+        if (symbol.length() == 1) {
+            return symbol;
+        }
         int count = 0, num, total = 0;
         num = (int)symbol.charAt(count) - 48;
         while (num >= 0 && num <= 9) {
@@ -274,16 +290,47 @@ public class Communication {
 
     public String processSymbol(String symbol) throws Exception {
         if(symbol != null){
+            if (symbol.equals("a"))
+                return "z";
+            if (symbol.equals("b"))
+                return "x";
+            if (symbol.equals("c"))
+                return "c";
             // 输出此前已回复的响应
-            for (String query : queries) {
+            System.out.println("Prefix list: ");
+            if (queries.size() == 0)
+                System.out.println("empty");
+            for (String query : queries)
                 analysisSymbol(query);
+            queries.add(symbol);
+            // 判断是否使用缓存
+            int i;
+            for (i = 0; i < lastQueries.size() && i < queries.size(); i++) {
+                if (!Objects.equals(lastQueries.get(i), queries.get(i))) {
+                    break;
+                }
             }
-            // 处理字符串，将字母表中的表达式转换为CS通信中要求的格式
+            if (i == queries.size()) {
+                System.out.println("Cache Reply: " + lastQueriesReply.get(i - 1));
+                queriesReply.add(lastQueriesReply.get(i - 1));
+                return lastQueriesReply.get(i - 1);
+            }
+            // 不使用缓存时处理字符串，将字母表中的表达式转换为CS通信中要求的格式
             symbol = encryptSymbol(symbol);
             // 发送消息，并等待回复
             symbol = receiveSymbol(symbol);
             // 处理CS消息，转换为字母表形式
-            return decryptSymbol(symbol, false);
+            symbol = decryptSymbol(symbol, false);
+            queriesReply.add(symbol);
+            if (lastQueries.size() < queries.size() || i < lastQueries.size() - 1) {
+                lastQueries = new Vector<>(100);
+                lastQueriesReply = new Vector<>(100);
+                for (int j = 0; j < queries.size(); j++) {
+                    lastQueries.add(queries.get(j));
+                    lastQueriesReply.add(queriesReply.get(j));
+                }
+            }
+            return symbol;
         }
         else {
             return "null";
@@ -293,5 +340,6 @@ public class Communication {
     public void reset() throws Exception {
         decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true);
         queries = new Vector<>(100);
+        queriesReply = new Vector<>(100);
     }
 }

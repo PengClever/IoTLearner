@@ -2,9 +2,9 @@ digraph g {
 __start0 [label="" shape="none"];
 
 	s0 [shape="circle" label="0"];
-	s0 -> s0 [label="a / d"];
-	s0 -> s0 [label="b / e"];
-	s0 -> s0 [label="c / e"];
+	s0 -> s0 [label="a / z"];
+	s0 -> s0 [label="b / x"];
+	s0 -> s0 [label="c / c"];
 
 __start0 -> s0;
 }
