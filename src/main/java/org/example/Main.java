@@ -11,8 +11,7 @@ public class Main {
         LearnerConfig config = new LearnerConfig(filename);
         // 创建学习者
         Learner learner = new Learner(config);
-//        // 学习状态机
-//        learner.learn();
-//        // ToDO A pap
+        // 学习状态机
+        learner.learn();
     }
 }

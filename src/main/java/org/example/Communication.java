@@ -10,9 +10,9 @@ public class Communication {
     InputStream input;
     byte[] bytes;
     public Communication(LearnerConfig config) throws Exception {
-//        // Test CS communication
-//        System.out.println("symbol: " + "ADU1CWR");
-//        System.out.println("encryptSymbol: " + encryptSymbol("ADU1CWR"));
+        // Test CS communication
+//        System.out.println("symbol: " + "ADU1CWRD88:97:46:2C:9A:CE");
+//        System.out.println("encryptSymbol: " + encryptSymbol("ADU1CWRD88:97:46:2C:9A:CE"));
 //        System.out.println("decryptSymbol: " + decryptSymbol("5ERROR0"));
         try {
             socket = new Socket(config.host, config.port);
@@ -24,8 +24,8 @@ public class Communication {
         output = socket.getOutputStream();
         input = socket.getInputStream();
         // Test CS communication
-        decryptSymbol(receiveSymbol(encryptSymbol("ADU1CWR")));
-        while (true){}
+//        decryptSymbol(receiveSymbol(encryptSymbol("ADU1CWR")));
+//        while (true){}
     }
 
     public String receiveSymbol(String symbol) throws Exception {
@@ -42,8 +42,14 @@ public class Communication {
         switch (symbol) {
             case "ADU1CWR":
                 return "2AD2U11C2WR0";
+            case "ADU1CWRD88:97:46:2C:9A:CE":
+                return "2AD2U11C2WR18D88:97:46:2C:9A:CE";
             case "DDU1CWR":
                 return "2DD2U11C2WR0";
+            case "DDU1CWRD88:97:46:2C:9A:CE":
+                return "2DD2U11C2WR18D88:97:46:2C:9A:CE";
+            case "DDU2CWRD88:97:46:2C:9A:CE":
+                return "2DD2U21C2WR18D88:97:46:2C:9A:CE";
             case "SQU1CWRU2":
                 return "2SQ2U11C2WR2U2";
             case "SAU1CWRU2":
@@ -52,6 +58,10 @@ public class Communication {
                 return "2US2U11C2WR2U2";
             case "QHU2CWR":
                 return "2QH2U21C2WR0";
+            case "DCU1CWRON":
+                return "2DC2U11C2WR2ON";
+            case "DCU1CWROF":
+                return "2DC2U11C2WR2OF";
             case "DCU1DWRON":
                 return "2DC2U11D2WR2ON";
             case "DCU1DWROF":
@@ -60,10 +70,18 @@ public class Communication {
                 return "2DC2U11D2WL2ON";
             case "DCU1DWLOF":
                 return "2DC2U11D2WL2OF";
+            case "DCU1D88:97:46:2C:9A:CEWLON":
+                return "2DC2U118D88:97:46:2C:9A:CE2WL2ON";
+            case "DCU1D88:97:46:2C:9A:CEWLOF":
+                return "2DC2U118D88:97:46:2C:9A:CE2WL2OF";
             case "DCU1DZBON":
                 return "2DC2U11D2ZB2ON";
             case "DCU1DZBOF":
                 return "2DC2U11D2ZB2OF";
+            case "DCU2CWRON":
+                return "2DC2U21C2WR2ON";
+            case "DCU2CWROF":
+                return "2DC2U21C2WR2OF";
             case "DCU2DWRON":
                 return "2DC2U21D2WR2ON";
             case "DCU2DWROF":
@@ -72,6 +90,10 @@ public class Communication {
                 return "2DC2U21D2WL2ON";
             case "DCU2DWLOF":
                 return "2DC2U21D2WL2OF";
+            case "DCU2D88:97:46:2C:9A:CEWLON":
+                return "2DC2U218D88:97:46:2C:9A:CE2WL2ON";
+            case "DCU2D88:97:46:2C:9A:CEWLOF":
+                return "2DC2U218D88:97:46:2C:9A:CE2WL2OF";
             case "DCU2DZBON":
                 return "2DC2U21D2ZB2ON";
             case "DCU2DZBOF":
