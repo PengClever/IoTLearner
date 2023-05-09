@@ -4,17 +4,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Vector;
 
 public class Communication {
     Socket socket;
     OutputStream output;
     InputStream input;
     byte[] bytes;
+    Vector<String> queries;
     public Communication(LearnerConfig config) throws Exception {
         // Test CS communication
 //        System.out.println("symbol: " + "ADU1CWRD88:97:46:2C:9A:CE");
 //        System.out.println("encryptSymbol: " + encryptSymbol("ADU1CWRD88:97:46:2C:9A:CE"));
-//        System.out.println("decryptSymbol: " + decryptSymbol("5ERROR0"));
+//        System.out.println("decryptSymbol: " + decryptSymbol("5ERROR0", false));
+//        queries = new Vector<>(100);
+//        queries.add("ADU1CWRD88:97:46:2C:9A:CE");
+//        queries.add("DCU1D88:97:46:2C:9A:CEWLON");
+//        System.out.println("Queries: " + queries);
+//        System.out.println("Queries: " + queries.get(0));
+//        System.out.println("Queries: " + queries.size());
+//        analysisSymbol(queries.get(0));
         try {
             socket = new Socket(config.host, config.port);
         } catch (Exception e) {
@@ -37,6 +46,122 @@ public class Communication {
         symbol = new String(bytes, 0, len);
         System.out.println("Frida server(encrypted): " + symbol);
         return symbol;
+    }
+
+    public void analysisSymbol(String symbol) {
+        String OpName, Source, Dest, Channel, Message;
+        switch (symbol) {
+            case "ADU1CWRD88:97:46:2C:9A:CE":
+                OpName = "AD";
+                Source = "U1";
+                Dest = "C";
+                Channel = "WR";
+                Message = "D88:97:46:2C:9A:CE";
+                break;
+            case "SAU1CWRU2":
+                OpName = "SA";
+                Source = "U1";
+                Dest = "C";
+                Channel = "WR";
+                Message = "U2";
+                break;
+            case "USU1CWRU2":
+                OpName = "US";
+                Source = "U1";
+                Dest = "C";
+                Channel = "WR";
+                Message = "U2";
+                break;
+            case "DCU1CWRON":
+                OpName = "DC";
+                Source = "U1";
+                Dest = "C";
+                Channel = "WR";
+                Message = "ON";
+                break;
+            case "DCU1CWROF":
+                OpName = "DC";
+                Source = "U1";
+                Dest = "C";
+                Channel = "WR";
+                Message = "OF";
+                break;
+            case "DCU2CWRON":
+                OpName = "DC";
+                Source = "U2";
+                Dest = "C";
+                Channel = "WR";
+                Message = "ON";
+                break;
+            case "DCU2CWROF":
+                OpName = "DC";
+                Source = "U2";
+                Dest = "C";
+                Channel = "WR";
+                Message = "OF";
+                break;
+            case "DCU1D88:97:46:2C:9A:CEWLON":
+                OpName = "DC";
+                Source = "U1";
+                Dest = "D88:97:46:2C:9A:CE";
+                Channel = "WL";
+                Message = "ON";
+                break;
+            case "DCU1D88:97:46:2C:9A:CEWLOF":
+                OpName = "DC";
+                Source = "U1";
+                Dest = "D88:97:46:2C:9A:CE";
+                Channel = "WL";
+                Message = "OF";
+                break;
+            case "DCU2D88:97:46:2C:9A:CEWLON":
+                OpName = "DC";
+                Source = "U2";
+                Dest = "D88:97:46:2C:9A:CE";
+                Channel = "WL";
+                Message = "ON";
+                break;
+            case "DCU2D88:97:46:2C:9A:CEWLOF":
+                OpName = "DC";
+                Source = "U2";
+                Dest = "D88:97:46:2C:9A:CE";
+                Channel = "WL";
+                Message = "OF";
+                break;
+            case "DDU1CWRD88:97:46:2C:9A:CE":
+                OpName = "DD";
+                Source = "U1";
+                Dest = "C";
+                Channel = "WR";
+                Message = "D88:97:46:2C:9A:CE";
+                break;
+            case "IRU2CWRAC":
+                OpName = "IR";
+                Source = "U2";
+                Dest = "C";
+                Channel = "WR";
+                Message = "AC";
+                break;
+            case "IRU2CWRDE":
+                OpName = "IR";
+                Source = "U2";
+                Dest = "C";
+                Channel = "WR";
+                Message = "DE";
+                break;
+            default:
+                OpName = "";
+                Source = "";
+                Dest = "";
+                Channel = "";
+                Message = "";
+        }
+        System.out.println(symbol);
+        System.out.println("{OpName: " + OpName +
+                ", Source: " + Source +
+                ", Dest: " + Dest +
+                ", Channel: " + Channel +
+                ", Message: " + Message + "}");
     }
 
     public String encryptSymbol(String symbol) {
@@ -103,6 +228,10 @@ public class Communication {
                 return "2AC2U21C2WR0";
             case "DEU2CWR":
                 return "2DE2U21C2WR0";
+            case "IRU2CWRAC":
+                return "2IR2U21C2WR2AC";
+            case "IRU2CWRDE":
+                return "2IR2U21C2WR2DE";
             case "RESET":
                 return "5RESET0000";
             case "FINISH":
@@ -145,6 +274,10 @@ public class Communication {
 
     public String processSymbol(String symbol) throws Exception {
         if(symbol != null){
+            // 输出此前已回复的响应
+            for (String query : queries) {
+                analysisSymbol(query);
+            }
             // 处理字符串，将字母表中的表达式转换为CS通信中要求的格式
             symbol = encryptSymbol(symbol);
             // 发送消息，并等待回复
@@ -159,6 +292,6 @@ public class Communication {
 
     public void reset() throws Exception {
         decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true);
-
+        queries = new Vector<>(100);
     }
 }
