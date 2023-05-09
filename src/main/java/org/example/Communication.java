@@ -1,5 +1,6 @@
 package org.example;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -111,7 +112,7 @@ public class Communication {
         }
     }
 
-    public String decryptSymbol(String symbol) {
+    public String decryptSymbol(String symbol, boolean isReset) throws IOException {
         if (symbol == null)
             return null;
         int count = 0, num, total = 0;
@@ -132,6 +133,10 @@ public class Communication {
                 count++;
                 num = (int) symbol.charAt(count) - 48;
             }
+            if (isReset) {
+                if (!symbol.substring(count, count + total).equals("SUC"))
+                    output.write(encryptSymbol("FINISH").getBytes());
+            }
             decryptSymbol += symbol.substring(count, count + total);
         }
         System.out.println("Frida server(decrypted): " + decryptSymbol);
@@ -145,7 +150,7 @@ public class Communication {
             // 发送消息，并等待回复
             symbol = receiveSymbol(symbol);
             // 处理CS消息，转换为字母表形式
-            return decryptSymbol(symbol);
+            return decryptSymbol(symbol, false);
         }
         else {
             return "null";
@@ -153,6 +158,6 @@ public class Communication {
     }
 
     public void reset() throws Exception {
-        output.write(encryptSymbol("RESET").getBytes());
+        decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true);
     }
 }
