@@ -159,5 +159,6 @@ public class Communication {
 
     public void reset() throws Exception {
         decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true);
+
     }
 }
