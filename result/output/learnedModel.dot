@@ -5,6 +5,11 @@ __start0 [label="" shape="none"];
 	s0 -> s0 [label="a / z"];
 	s0 -> s0 [label="b / x"];
 	s0 -> s0 [label="c / c"];
+	s0 -> s0 [label="d / v"];
+	s0 -> s0 [label="e / b"];
+	s0 -> s0 [label="f / n"];
+	s0 -> s0 [label="g / m"];
+	s0 -> s0 [label="h / a"];
 
 __start0 -> s0;
 }

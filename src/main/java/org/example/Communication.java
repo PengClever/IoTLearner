@@ -16,6 +16,7 @@ public class Communication {
     Vector<String> queriesReply;
     Vector<String> lastQueries;
     Vector<String> lastQueriesReply;
+    DebugLog log;
     public Communication(LearnerConfig config) throws Exception {
         // Test CS communication
 //        System.out.println("symbol: " + "ADU1CWRD88:97:46:2C:9A:CE");
@@ -39,6 +40,7 @@ public class Communication {
         input = socket.getInputStream();
         lastQueries = new Vector<>(100);
         lastQueriesReply = new Vector<>(100);
+        log = new DebugLog();
         // Test CS communication
 //        decryptSymbol(receiveSymbol(encryptSymbol("ADU1CWR")));
 //        receiveSymbol("111");
@@ -179,6 +181,16 @@ public class Communication {
                 return "b";
             case "c":
                 return "c";
+            case "d":
+                return "d";
+            case "e":
+                return "e";
+            case "f":
+                return "f";
+            case "g":
+                return "g";
+            case "h":
+                return "h";
             case "ADU1CWR":
                 return "2AD2U11C2WR0";
             case "ADU1CWRD88:97:46:2C:9A:CE":
@@ -290,12 +302,22 @@ public class Communication {
 
     public String processSymbol(String symbol) throws Exception {
         if(symbol != null){
-            if (symbol.equals("a"))
-                return "z";
-            if (symbol.equals("b"))
-                return "x";
-            if (symbol.equals("c"))
-                return "c";
+//            if (symbol.equals("a"))
+//                return "z";
+//            if (symbol.equals("b"))
+//                return "x";
+//            if (symbol.equals("c"))
+//                return "c";
+//            if (symbol.equals("d"))
+//                return "v";
+//            if (symbol.equals("e"))
+//                return "b";
+//            if (symbol.equals("f"))
+//                return "n";
+//            if (symbol.equals("g"))
+//                return "m";
+//            if (symbol.equals("h"))
+//                return "a";
             // 输出此前已回复的响应
             System.out.println("Prefix list: ");
             if (queries.size() == 0)
@@ -313,9 +335,11 @@ public class Communication {
             if (i == queries.size()) {
                 System.out.println("Cache Reply: " + lastQueriesReply.get(i - 1));
                 queriesReply.add(lastQueriesReply.get(i - 1));
+                log.addLog(lastQueries.get(i - 1), lastQueriesReply.get(i - 1), 2);
                 return lastQueriesReply.get(i - 1);
             }
             // 不使用缓存时处理字符串，将字母表中的表达式转换为CS通信中要求的格式
+            String outSymol = symbol;
             symbol = encryptSymbol(symbol);
             // 发送消息，并等待回复
             symbol = receiveSymbol(symbol);
@@ -330,6 +354,7 @@ public class Communication {
                     lastQueriesReply.add(queriesReply.get(j));
                 }
             }
+            log.addLog(outSymol, symbol, 1);
             return symbol;
         }
         else {
@@ -338,7 +363,7 @@ public class Communication {
     }
 
     public void reset() throws Exception {
-        decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true);
+        log.addLog("Reset", decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true), 0);
         queries = new Vector<>(100);
         queriesReply = new Vector<>(100);
     }
