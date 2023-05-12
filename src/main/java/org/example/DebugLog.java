@@ -2,6 +2,7 @@ package org.example;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Objects;
 
 public class DebugLog {
     static String filename = "result/output/DebugLog.txt";
@@ -20,11 +21,14 @@ public class DebugLog {
         fos = new FileOutputStream(file, true);
     }
 
+    public void addLog(String symbol, long count) throws Exception {
+        if (Objects.equals(symbol, "Reset")){
+            fos.write(("[" + count + "] " + "\n").getBytes());
+        }
+    }
+
     public void addLog(String outSymbol, String inSymbol, int mode) throws Exception {
         switch (mode) {
-            case 0:
-                fos.write(("[" + outSymbol + "] " + inSymbol + "\n").getBytes());
-                break;
             case 1:
                 fos.write(("[CS] " + outSymbol + " -> " + inSymbol + "\n").getBytes());
                 break;

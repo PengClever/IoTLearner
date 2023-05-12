@@ -17,6 +17,7 @@ public class Communication {
     Vector<String> lastQueries;
     Vector<String> lastQueriesReply;
     DebugLog log;
+    long resetCount;
     public Communication(LearnerConfig config) throws Exception {
         // Test CS communication
 //        System.out.println("symbol: " + "ADU1CWRD88:97:46:2C:9A:CE");
@@ -41,6 +42,7 @@ public class Communication {
         lastQueries = new Vector<>(100);
         lastQueriesReply = new Vector<>(100);
         log = new DebugLog();
+        resetCount = 0;
         // Test CS communication
 //        decryptSymbol(receiveSymbol(encryptSymbol("ADU1CWR")));
 //        receiveSymbol("111");
@@ -302,22 +304,22 @@ public class Communication {
 
     public String processSymbol(String symbol) throws Exception {
         if(symbol != null){
-//            if (symbol.equals("a"))
-//                return "z";
-//            if (symbol.equals("b"))
-//                return "x";
-//            if (symbol.equals("c"))
-//                return "c";
-//            if (symbol.equals("d"))
-//                return "v";
-//            if (symbol.equals("e"))
-//                return "b";
-//            if (symbol.equals("f"))
-//                return "n";
-//            if (symbol.equals("g"))
-//                return "m";
-//            if (symbol.equals("h"))
-//                return "a";
+            if (symbol.equals("a"))
+                return "z";
+            if (symbol.equals("b"))
+                return "x";
+            if (symbol.equals("c"))
+                return "c";
+            if (symbol.equals("d"))
+                return "v";
+            if (symbol.equals("e"))
+                return "b";
+            if (symbol.equals("f"))
+                return "n";
+            if (symbol.equals("g"))
+                return "m";
+            if (symbol.equals("h"))
+                return "a";
             // 输出此前已回复的响应
             System.out.println("Prefix list: ");
             if (queries.size() == 0)
@@ -363,7 +365,8 @@ public class Communication {
     }
 
     public void reset() throws Exception {
-        log.addLog("Reset", decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true), 0);
+        decryptSymbol(receiveSymbol(encryptSymbol("RESET")), true);
+        log.addLog("Reset", resetCount++);
         queries = new Vector<>(100);
         queriesReply = new Vector<>(100);
     }
