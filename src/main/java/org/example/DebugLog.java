@@ -33,6 +33,9 @@ public class DebugLog {
             case 1:
                 fos.write(("[" + resetCount + "][Cache] " + outSymbol + " -> " + inSymbol + "\n").getBytes());
                 break;
+            case 2:
+                fos.write(("[" + resetCount + "][Rule] " + outSymbol + " -> " + inSymbol + "\n").getBytes());
+                break;
             default:
                 System.out.println("日志添加失败");
         }

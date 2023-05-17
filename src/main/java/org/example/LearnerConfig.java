@@ -19,6 +19,8 @@ public class LearnerConfig {
     int seed = 1;
     String host;
     int port;
+    boolean useCache = false;
+    boolean useRule = false;
     public LearnerConfig(String filename) throws IOException {
 //        System.out.println("LearnerConfig(String filename)");
 //        System.out.println("filename: " + filename);
@@ -60,6 +62,12 @@ public class LearnerConfig {
 
         if(properties.getProperty("seed") != null)
             seed = Integer.parseInt(properties.getProperty("seed"));
+
+        if(properties.getProperty("cache") != null)
+            useCache = Integer.parseInt(properties.getProperty("cache")) != 0;
+
+        if(properties.getProperty("rule") != null)
+            useRule = Integer.parseInt(properties.getProperty("rule")) != 0;
 
         host = properties.getProperty("host");
         port = Integer.parseInt(properties.getProperty("port"));

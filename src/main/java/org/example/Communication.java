@@ -17,6 +17,10 @@ public class Communication {
     Vector<String> lastQueries;
     Vector<String> lastQueriesReply;
     DebugLog log;
+    boolean useCache;
+    boolean useRule;
+    Vector<String> deviceStack;
+    Vector<String> userStack;
     public Communication(LearnerConfig config) throws Exception {
         // Test CS communication
 //        System.out.println("symbol: " + "ADU1CWRD88:97:46:2C:9A:CE");
@@ -38,13 +42,32 @@ public class Communication {
         socket.setSoTimeout(0);
         output = socket.getOutputStream();
         input = socket.getInputStream();
-        lastQueries = new Vector<>(100);
-        lastQueriesReply = new Vector<>(100);
         log = new DebugLog();
+        useCache = config.useCache;
+        if (useCache) {
+            lastQueries = new Vector<>(100);
+            lastQueriesReply = new Vector<>(100);
+        }
+        useRule = config.useRule;
+        if (useRule) {
+            deviceStack = new Vector<>(5);
+            userStack = new Vector<>(10);
+        }
         // Test CS communication
 //        decryptSymbol(receiveSymbol(encryptSymbol("ADU1CWR")));
 //        receiveSymbol("111");
-//        while (true){}
+//        Scanner scan = new Scanner(System.in);
+//        String symbol = "";
+//        System.out.println("Test：" + symbol);
+//        reset();
+//        while (true){
+//            System.out.println("请输入数据：");
+//            if (scan.hasNext()) {
+//                symbol = scan.next();
+//                System.out.println("输入的数据为：" + symbol);
+//            }
+//            processSymbol(symbol);
+//        }
     }
 
     public String receiveSymbol(String symbol) throws Exception {
@@ -58,119 +81,13 @@ public class Communication {
     }
 
     public void analysisSymbol(String symbol) {
-        String OpName, Source, Dest, Channel, Message;
-        switch (symbol) {
-            case "ADU1CWRD88:97:46:2C:9A:CE":
-                OpName = "AD";
-                Source = "U1";
-                Dest = "C";
-                Channel = "WR";
-                Message = "D88:97:46:2C:9A:CE";
-                break;
-            case "SAU1CWRU2":
-                OpName = "SA";
-                Source = "U1";
-                Dest = "C";
-                Channel = "WR";
-                Message = "U2";
-                break;
-            case "USU1CWRU2":
-                OpName = "US";
-                Source = "U1";
-                Dest = "C";
-                Channel = "WR";
-                Message = "U2";
-                break;
-            case "DCU1CWRON":
-                OpName = "DC";
-                Source = "U1";
-                Dest = "C";
-                Channel = "WR";
-                Message = "ON";
-                break;
-            case "DCU1CWROF":
-                OpName = "DC";
-                Source = "U1";
-                Dest = "C";
-                Channel = "WR";
-                Message = "OF";
-                break;
-            case "DCU2CWRON":
-                OpName = "DC";
-                Source = "U2";
-                Dest = "C";
-                Channel = "WR";
-                Message = "ON";
-                break;
-            case "DCU2CWROF":
-                OpName = "DC";
-                Source = "U2";
-                Dest = "C";
-                Channel = "WR";
-                Message = "OF";
-                break;
-            case "DCU1D88:97:46:2C:9A:CEWLON":
-                OpName = "DC";
-                Source = "U1";
-                Dest = "D88:97:46:2C:9A:CE";
-                Channel = "WL";
-                Message = "ON";
-                break;
-            case "DCU1D88:97:46:2C:9A:CEWLOF":
-                OpName = "DC";
-                Source = "U1";
-                Dest = "D88:97:46:2C:9A:CE";
-                Channel = "WL";
-                Message = "OF";
-                break;
-            case "DCU2D88:97:46:2C:9A:CEWLON":
-                OpName = "DC";
-                Source = "U2";
-                Dest = "D88:97:46:2C:9A:CE";
-                Channel = "WL";
-                Message = "ON";
-                break;
-            case "DCU2D88:97:46:2C:9A:CEWLOF":
-                OpName = "DC";
-                Source = "U2";
-                Dest = "D88:97:46:2C:9A:CE";
-                Channel = "WL";
-                Message = "OF";
-                break;
-            case "DDU1CWRD88:97:46:2C:9A:CE":
-                OpName = "DD";
-                Source = "U1";
-                Dest = "C";
-                Channel = "WR";
-                Message = "D88:97:46:2C:9A:CE";
-                break;
-            case "IRU2CWRAC":
-                OpName = "IR";
-                Source = "U2";
-                Dest = "C";
-                Channel = "WR";
-                Message = "AC";
-                break;
-            case "IRU2CWRDE":
-                OpName = "IR";
-                Source = "U2";
-                Dest = "C";
-                Channel = "WR";
-                Message = "DE";
-                break;
-            default:
-                OpName = "";
-                Source = "";
-                Dest = "";
-                Channel = "";
-                Message = "";
-        }
+        Alphabet alphabet = new Alphabet(symbol);
         System.out.println(symbol);
-        System.out.println("{OpName: " + OpName +
-                ", Source: " + Source +
-                ", Dest: " + Dest +
-                ", Channel: " + Channel +
-                ", Message: " + Message + "}");
+        System.out.println("{OpName: " + alphabet.OpName +
+                ", Source: " + alphabet.Source +
+                ", Dest: " + alphabet.Dest +
+                ", Channel: " + alphabet.Channel +
+                ", Message: " + alphabet.Message + "}");
     }
 
     public String encryptSymbol(String symbol) {
@@ -191,78 +108,9 @@ public class Communication {
                 return "g";
             case "h":
                 return "h";
-            case "ADU1CWR":
-                return "2AD2U11C2WR0";
-            case "ADU1CWRD88:97:46:2C:9A:CE":
-                return "2AD2U11C2WR18D88:97:46:2C:9A:CE";
-            case "DDU1CWR":
-                return "2DD2U11C2WR0";
-            case "DDU1CWRD88:97:46:2C:9A:CE":
-                return "2DD2U11C2WR18D88:97:46:2C:9A:CE";
-            case "DDU2CWRD88:97:46:2C:9A:CE":
-                return "2DD2U21C2WR18D88:97:46:2C:9A:CE";
-            case "SQU1CWRU2":
-                return "2SQ2U11C2WR2U2";
-            case "SAU1CWRU2":
-                return "2SA2U11C2WR2U2";
-            case "USU1CWRU2":
-                return "2US2U11C2WR2U2";
-            case "QHU2CWR":
-                return "2QH2U21C2WR0";
-            case "DCU1CWRON":
-                return "2DC2U11C2WR2ON";
-            case "DCU1CWROF":
-                return "2DC2U11C2WR2OF";
-            case "DCU1DWRON":
-                return "2DC2U11D2WR2ON";
-            case "DCU1DWROF":
-                return "2DC2U11D2WR2OF";
-            case "DCU1DWLON":
-                return "2DC2U11D2WL2ON";
-            case "DCU1DWLOF":
-                return "2DC2U11D2WL2OF";
-            case "DCU1D88:97:46:2C:9A:CEWLON":
-                return "2DC2U118D88:97:46:2C:9A:CE2WL2ON";
-            case "DCU1D88:97:46:2C:9A:CEWLOF":
-                return "2DC2U118D88:97:46:2C:9A:CE2WL2OF";
-            case "DCU1DZBON":
-                return "2DC2U11D2ZB2ON";
-            case "DCU1DZBOF":
-                return "2DC2U11D2ZB2OF";
-            case "DCU2CWRON":
-                return "2DC2U21C2WR2ON";
-            case "DCU2CWROF":
-                return "2DC2U21C2WR2OF";
-            case "DCU2DWRON":
-                return "2DC2U21D2WR2ON";
-            case "DCU2DWROF":
-                return "2DC2U21D2WR2OF";
-            case "DCU2DWLON":
-                return "2DC2U21D2WL2ON";
-            case "DCU2DWLOF":
-                return "2DC2U21D2WL2OF";
-            case "DCU2D88:97:46:2C:9A:CEWLON":
-                return "2DC2U218D88:97:46:2C:9A:CE2WL2ON";
-            case "DCU2D88:97:46:2C:9A:CEWLOF":
-                return "2DC2U218D88:97:46:2C:9A:CE2WL2OF";
-            case "DCU2DZBON":
-                return "2DC2U21D2ZB2ON";
-            case "DCU2DZBOF":
-                return "2DC2U21D2ZB2OF";
-            case "ACU2CWR":
-                return "2AC2U21C2WR0";
-            case "DEU2CWR":
-                return "2DE2U21C2WR0";
-            case "IRU2CWRAC":
-                return "2IR2U21C2WR2AC";
-            case "IRU2CWRDE":
-                return "2IR2U21C2WR2DE";
-            case "RESET":
-                return "5RESET0000";
-            case "FINISH":
-                return "6FINISH0000";
             default:
-                return "Wrong_symbol";
+                Alphabet alphabet = new Alphabet(symbol);
+                return alphabet.encryptSymbol;
         }
     }
 
@@ -300,7 +148,30 @@ public class Communication {
         return decryptSymbol;
     }
 
+    public void processStack(String outSymbol, String inSymbol) {
+        if (Objects.equals(inSymbol, "Forbidden"))
+            return;
+        Alphabet alphabet = new Alphabet(outSymbol);
+        switch (alphabet.OpName) {
+            case "AD":
+                deviceStack.add(alphabet.Message);
+                break;
+            case "SA":
+                userStack.add(alphabet.Message);
+                break;
+            case "DD":
+                deviceStack.remove(alphabet.Message);
+                break;
+            case "IR":
+                userStack.removeElementAt(0);
+                break;
+            default:
+                break;
+        }
+    }
+
     public String processSymbol(String symbol) throws Exception {
+        System.out.println("processSymbol");
         if(symbol != null){
             // 本地简单配置测试
             if (symbol.equals("a"))
@@ -327,36 +198,57 @@ public class Communication {
                 analysisSymbol(query);
             queries.add(symbol);
             // 判断是否使用缓存
-            int i;
-            for (i = 0; i < lastQueries.size() && i < queries.size(); i++) {
-                if (!Objects.equals(lastQueries.get(i), queries.get(i))) {
-                    break;
+            int i = 0;
+            if (useCache) {
+                for (; i < lastQueries.size() && i < queries.size(); i++) {
+                    if (!Objects.equals(lastQueries.get(i), queries.get(i))) {
+                        break;
+                    }
+                }
+                if (i == queries.size()) {
+                    System.out.println("Cache Reply: " + lastQueriesReply.get(i - 1));
+                    queriesReply.add(lastQueriesReply.get(i - 1));
+                    log.addLog(lastQueries.get(i - 1), lastQueriesReply.get(i - 1), 1);
+                    if (useRule)
+                        processStack(lastQueries.get(i - 1), lastQueriesReply.get(i - 1));
+                    return lastQueriesReply.get(i - 1);
                 }
             }
-            if (i == queries.size()) {
-                System.out.println("Cache Reply: " + lastQueriesReply.get(i - 1));
-                queriesReply.add(lastQueriesReply.get(i - 1));
-                log.addLog(lastQueries.get(i - 1), lastQueriesReply.get(i - 1), 1);
-                return lastQueriesReply.get(i - 1);
-            }
-            // 不使用缓存时处理字符串，将字母表中的表达式转换为CS通信中要求的格式
+            // 判断是否使用简单规则
             String outSymol = symbol;
-            symbol = encryptSymbol(symbol);
-            // 发送消息，并等待回复
-            symbol = receiveSymbol(symbol);
-            // 处理CS消息，转换为字母表形式
-            symbol = decryptSymbol(symbol, false);
-            queriesReply.add(symbol);
-            if (lastQueries.size() < queries.size() || i < lastQueries.size() - 1) {
-                lastQueries = new Vector<>(100);
-                lastQueriesReply = new Vector<>(100);
-                for (int j = 0; j < queries.size(); j++) {
-                    lastQueries.add(queries.get(j));
-                    lastQueriesReply.add(queriesReply.get(j));
+            String inSymbol = null;
+            if (useRule) {
+                Alphabet alphabet = new Alphabet(outSymol);
+                if ((Objects.equals(alphabet.OpName, "DC") || Objects.equals(alphabet.OpName, "DD"))
+                        && deviceStack.isEmpty())
+                    inSymbol = "Forbidden";
+                if (Objects.equals(alphabet.OpName, "IR") && userStack.isEmpty())
+                    inSymbol = "Forbidden";
+            }
+            // 不使用缓存和简单规则处理字符串，将字母表中的表达式转换为CS通信中要求的格式
+            if (inSymbol == null) {
+                symbol = encryptSymbol(symbol);
+                // 发送消息，并等待回复
+                symbol = receiveSymbol(symbol);
+                // 处理CS消息，转换为字母表形式
+                inSymbol = decryptSymbol(symbol, false);
+                log.addLog(outSymol, inSymbol, 0);
+            } else
+                log.addLog(outSymol, inSymbol, 2);
+            queriesReply.add(inSymbol);
+            if (useCache) {
+                if (lastQueries.size() < queries.size() || i < lastQueries.size() - 1) {
+                    lastQueries = new Vector<>(100);
+                    lastQueriesReply = new Vector<>(100);
+                    for (int j = 0; j < queries.size(); j++) {
+                        lastQueries.add(queries.get(j));
+                        lastQueriesReply.add(queriesReply.get(j));
+                    }
                 }
             }
-            log.addLog(outSymol, symbol, 0);
-            return symbol;
+            if (useRule)
+                processStack(outSymol, inSymbol);
+            return inSymbol;
         }
         else {
             return "null";
@@ -368,5 +260,9 @@ public class Communication {
         log.addResetCount();
         queries = new Vector<>(100);
         queriesReply = new Vector<>(100);
+        if (useRule) {
+            deviceStack = new Vector<>(5);
+            userStack = new Vector<>(10);
+        }
     }
 }
